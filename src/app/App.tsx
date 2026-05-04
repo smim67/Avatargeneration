@@ -23,6 +23,8 @@ const translations = {
     howItWorks: 'Просто введите любой текст, выберите стиль (пиксельный, геометрический, blob, человек или животное), и сервис сгенерирует для вас уникальный аватар на основе хэша текста. Результат можно скачать в форматах PNG или SVG.',
     allRightsReserved: 'Все права защищены',
     developedBy: 'Разработано:',
+    cookieNotice: 'Мы используем cookie для улучшения работы сайта. Продолжая использовать сайт, вы соглашаетесь с этим.',
+    cookieAccept: 'Принять',
   },
   en: {
     title: 'Avatar Generator',
@@ -42,6 +44,8 @@ const translations = {
     howItWorks: 'Simply enter any text, choose a style (pixel, geometric, blob, human, or animal), and the service will generate a unique avatar based on the text hash. Results can be downloaded in PNG or SVG formats.',
     allRightsReserved: 'All rights reserved',
     developedBy: 'Developed by:',
+    cookieNotice: 'We use cookies to improve the site. By continuing to use the site, you agree to this.',
+    cookieAccept: 'Accept',
   },
 };
 
@@ -49,10 +53,24 @@ export default function App() {
   const [text, setText] = useState('');
   const [style, setStyle] = useState<AvatarStyle>('pixel');
   const [language, setLanguage] = useState<Language>('ru');
+  const [showCookieNotice, setShowCookieNotice] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const t = translations[language];
+
+  // Check if user already accepted cookies
+  useEffect(() => {
+    const cookieAccepted = localStorage.getItem('cookieAccepted');
+    if (cookieAccepted === 'true') {
+      setShowCookieNotice(false);
+    }
+  }, []);
+
+  const acceptCookies = () => {
+    localStorage.setItem('cookieAccepted', 'true');
+    setShowCookieNotice(false);
+  };
 
   // Set SEO meta tags and viewport
   useEffect(() => {
@@ -842,6 +860,21 @@ export default function App() {
           </p>
         </footer>
       </div>
+
+      {/* Cookie Notice */}
+      {showCookieNotice && (
+        <div className="fixed bottom-4 left-4 max-w-sm bg-neutral-900 border border-neutral-800 rounded-lg p-4 shadow-2xl z-50 animate-in slide-in-from-bottom-5">
+          <p className="text-neutral-300 text-sm mb-3 leading-relaxed">
+            {t.cookieNotice}
+          </p>
+          <button
+            onClick={acceptCookies}
+            className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
+          >
+            {t.cookieAccept}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
